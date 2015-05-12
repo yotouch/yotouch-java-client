@@ -1,5 +1,7 @@
 package com.yotouch.entity;
 
+import org.json.JSONObject;
+
 public class MetaField {
     
     public static final FieldType TYPE_STRING = new FieldType("string");
@@ -28,6 +30,14 @@ public class MetaField {
     
     public MetaEntity getMetaEntity() {
         return this.metaEntity;
+    }
+
+    public static MetaField fromJsonObject(JSONObject fieldObj) {
+        String name = fieldObj.getString("name");
+        String type = fieldObj.getString("type");
+        
+        MetaField mf = new MetaField(name, new FieldType(type));
+        return mf;
     }
 
 }
