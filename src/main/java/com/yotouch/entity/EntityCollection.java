@@ -2,6 +2,7 @@ package com.yotouch.entity;
 
 import com.yotouch.config.ConfigManager;
 import com.yotouch.network.GetClient;
+import com.yotouch.network.PostClient;
 
 public class EntityCollection {
     
@@ -26,6 +27,14 @@ public class EntityCollection {
         Entity entity = gClient.doGetEntity(uri);
         
         return entity;
+    }
+
+    public Entity save(Entity entity) {
+        
+        PostClient pClient = cfgMgr.getPostClient();
+        
+        String uri = "/entity/save/" + this.entityName + "/" + this.companyId;
+        return pClient.doPostEntity(uri, entity);
     }
 
 }

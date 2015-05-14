@@ -24,6 +24,10 @@ public class Entity {
         this.values.put(name, v);
     }
     
+    public boolean isSetValue(String name) {
+        return this.values.containsKey(name);
+    }
+    
     public String getId() {
         return this.getStringValue("_id");
     }
@@ -58,6 +62,17 @@ public class Entity {
     @Override
     public String toString() {
         return "[Entity] " + this.getMetaEntity().getName() + "=>" + this.getUUID();
+    }
+
+    public String asJSON() {
+        JSONObject valueJson = new JSONObject();
+        for (MetaField mf : this.getMetaEntity().getFields()) {
+            if (this.isSetValue(mf.getName())) {
+                valueJson.put(mf.getName(), this.getValue(mf.getName()));
+            }
+        }
+        
+        return valueJson.toString();
     }
 
 }

@@ -1,11 +1,10 @@
 package com.yotouch.config;
 
-import org.json.JSONObject;
+import com.yotouch.network.PostClient;
+import com.yotouch.network.GetClient;
 
 import com.yotouch.entity.Entity;
 import com.yotouch.entity.EntityCollection;
-import com.yotouch.entity.MetaEntity;
-import com.yotouch.network.GetClient;
 
 /**
  * Created by yinwm on 5/10/15.
@@ -17,10 +16,12 @@ public class ConfigManager {
     private String companyName;
     private Entity companyEntity;
     private GetClient getClient;
+    private PostClient postClient;
 
     public ConfigManager(String yotouchUrl) {
         //this.ytUrl = yotouchUrl;
         this.getClient = new GetClient(yotouchUrl);
+        this.postClient = new PostClient(yotouchUrl);
     }
 
     public void setCompanyId(String companyId) {
@@ -53,6 +54,8 @@ public class ConfigManager {
         return this.getClient;
     }
 
-
+    public PostClient getPostClient() {
+        return this.postClient;
+    }
 
 }
