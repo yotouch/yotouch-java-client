@@ -1,5 +1,8 @@
 package com.yotouch.example;
 
+import java.util.Date;
+import java.util.List;
+
 import com.yotouch.config.ConfigManager;
 import com.yotouch.entity.Entity;
 import com.yotouch.entity.EntityCollection;
@@ -11,10 +14,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ConfigManager cfgMgr = new ConfigManager("http://meiliaoshi.yotouch.com/api/v1");
-
         String companyName = "meiliaoshi";
-        cfgMgr.setCompanyName(companyName);
+        ConfigManager cfgMgr = new ConfigManager("http://meiliaoshi.yotouch.com/api/v1", companyName);
+
 
         EntityCollection staffColl = cfgMgr.getEntityCollection("staff");
         Entity staff = staffColl.get("admin");
@@ -24,6 +26,18 @@ public class Main {
         
         staff.setValue("fullname", "管理");
         Entity savedStaff = staffColl.save(staff);
+        
+        
+        EntityCollection orderColl = cfgMgr.getEntityCollection("order");
+        List<Entity> orders = orderColl.find();
+        System.out.println("orders " + orders);
+        
+        
+        Entity order = orderColl.newOne();
+        order.setValue("created_at", new Date());
+        orderColl.save(order);
+        
+        
 
     }
 

@@ -1,40 +1,65 @@
 package com.yotouch.entity;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.yotouch.config.ConfigManager;
 import com.yotouch.network.GetClient;
 import com.yotouch.network.PostClient;
 
 public class EntityCollection {
     
-    private String entityName;
-    private String companyId;
+    private MetaEntity metaEntity;
     private ConfigManager cfgMgr;
     
-    public EntityCollection(ConfigManager cfgMgr, String collName) {
-        this(cfgMgr, collName, null);
-    }
-
-    public EntityCollection(ConfigManager cfgMgr, String entityName, String comp) {
+    public EntityCollection(ConfigManager cfgMgr, MetaEntity metaEntity) {
         this.cfgMgr = cfgMgr;
-        this.entityName = entityName;
-        this.companyId = comp;
+        this.metaEntity = metaEntity;
     }
 
     public Entity get(String idOrName) {
         GetClient gClient = cfgMgr.getGetClient();
         
-        String uri = "/entity/get/" + this.entityName + "/" + this.companyId + "/" + idOrName;
+        String uri = "/entity/get/" + this.metaEntity.getName() + "/" + this.cfgMgr.getCompanyId()+ "/" + idOrName;
         Entity entity = gClient.doGetEntity(uri);
         
         return entity;
     }
 
     public Entity save(Entity entity) {
-        
         PostClient pClient = cfgMgr.getPostClient();
         
-        String uri = "/entity/save/" + this.entityName + "/" + this.companyId;
+        String uri = "/entity/save/" + this.metaEntity.getName() + "/" + this.cfgMgr.getCompanyId();
         return pClient.doPostEntity(uri, entity);
+    }
+
+    public List<Entity> find() {
+        GetClient gClient = cfgMgr.getGetClient();
+        
+        String uri = "/entity/find/" + this.metaEntity.getName() + "/" + this.cfgMgr.getCompanyId();
+        List<Entity> entityList = gClient.doGetEntityList(uri);
+        return entityList;
+    }
+    
+    
+    public Entity newOne() {
+        return this.newOne(new HashMap<String, Object>());
+    }
+    
+    public Entity newOne(Map<String, Object> d) {
+        Entity e = new Entity(this.metaEntity);
+        
+        for (MetaField mf : this.metaEntity.getFields()) {
+            String fname = mf.getName();
+            Object value = null;
+            if (d.containsKey(fname)) {
+                value = d.get(fname);
+            }
+            e.setValue(fname, value);
+        }
+        
+        return e;
     }
 
 }
