@@ -1,5 +1,6 @@
 package com.yotouch.workflow;
 
+import com.yotouch.Constants;
 import com.yotouch.entity.Entity;
 
 public class Action {
@@ -14,14 +15,16 @@ public class Action {
         this.actionEntity = actionEntity;
         
         String from = actionEntity.getStringValue("from");
-        this.fromState = wf.getState(from);
+        //System.out.println("from state name " + from);
+        this.fromState = this.wf.getState(from);
         this.fromState.addOutAction(this);
         
         String to = actionEntity.getStringValue("to");
-        this.toState = wf.getState(to);
+        //System.out.println("to state name " + to);
+        this.toState = this.wf.getState(to);
         this.toState.addInAction(this);
         
-        wf.addAction(this);
+        this.wf.addAction(this);
         
     }
 
@@ -35,6 +38,19 @@ public class Action {
     
     public State getTo() {
         return this.toState;
+    }
+
+    public static Action create(Workflow wf, Entity a) {
+        return new Action(wf, a);
+    }
+
+    public Entity act(Entity entity) {
+        State s = this.getTo();
+        if (!Constants.WF_STATE_SELF.equals(s.getName())) {
+            entity.setState(s);
+        }
+        
+        return entity;
     }
     
     

@@ -1,9 +1,9 @@
 package com.yotouch.workflow;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.yotouch.Constants;
-import com.yotouch.YotouchException;
 import com.yotouch.entity.Entity;
 
 public class State {
@@ -18,6 +18,10 @@ public class State {
     public State(Workflow wf, Entity stateEntity) {
         this.wf = wf;
         this.stateEntity = stateEntity;
+        
+        this.actions    = new HashMap<>();
+        this.inActions  = new HashMap<>();
+        this.outActions = new HashMap<>();
     }
 
     public String getName() {
@@ -63,6 +67,51 @@ public class State {
         return true;
     }
 
+    public static State create(Workflow wf, Entity e) {
+        if (Constants.WF_STATE_ANY.equals(e.getStringValue("name"))) {
+            return new AnyState(wf);
+        } else if (Constants.WF_STATE_SELF.equals(e.getStringValue("name"))) {
+            return new SelfState(wf);
+        } else {
+            return new State(wf, e);
+        }
+    }
+
+    public String getFullname() {
+        String fullname = this.stateEntity.getStringValue("fullname");
+        if (fullname == null || "".equals(fullname)) {
+            return this.getName();
+        } else {
+            return fullname;
+        }
+    }
+
+    public Map<String, Action> getOutActions() {
+        Map<String, Action> m = new HashMap<String, Action>();
+        m.putAll(this.outActions);
+        m.putAll(this.wf.getAnyActions());
+        return m;
+    }
+
+    public Action getOutAction(String name) {
+        if (this.outActions.containsKey(name)) {
+            return this.outActions.get(name);
+        } else {
+            return this.wf.getAnyActions().get(name);
+        }
+    }
+
+    public Workflow getWorkflow() {
+        return this.wf;
+    }
+
+    @Override
+    public String toString() {
+        return "State [workflow=" + wf + ", name=" + getName()+ "]";
+    }
+    
+    
+
 }
 
 
@@ -83,11 +132,6 @@ class AnyState extends State {
         return false;
     }
     
-    @Override
-    public void addOutAction(Action action) {
-        throw new YotouchException("Any state cannot add out action");
-    }
-    
 }
 
 class SelfState extends State {
@@ -99,6 +143,11 @@ class SelfState extends State {
     @Override
     public String getName() {
         return Constants.WF_STATE_SELF;
+    }
+    
+    @Override
+    public boolean isStart() {
+        return false;
     }
     
 }

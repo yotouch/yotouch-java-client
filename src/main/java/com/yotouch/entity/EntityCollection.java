@@ -20,24 +20,18 @@ public class EntityCollection {
 
     public Entity get(String idOrName) {
         GetClient gClient = cfgMgr.getGetClient();
-        
-        
-        
         Entity entity = gClient.doGetEntity(this.metaEntity.getName(), idOrName);
-        
         return entity;
     }
 
     public Entity save(Entity entity) {
         PostClient pClient = cfgMgr.getPostClient();
-        
         String uri = "/entity/save/" + this.metaEntity.getName() + "/" + this.cfgMgr.getCompanyId();
         return pClient.doPostEntity(uri, entity);
     }
 
     public List<Entity> find() {
         GetClient gClient = cfgMgr.getGetClient();
-        
         String uri = "/entity/find/" + this.metaEntity.getName() + "/" + this.cfgMgr.getCompanyId();
         List<Entity> entityList = gClient.doGetEntityList(uri);
         return entityList;

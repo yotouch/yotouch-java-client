@@ -4,7 +4,11 @@ import org.json.JSONObject;
 
 public class MetaField {
     
-    public static final FieldType TYPE_STRING = new FieldType("string");
+    public static final FieldType TYPE_STRING     = new FieldType("string");
+    public static final FieldType TYPE_TEXT       = new FieldType("text");
+    public static final FieldType TYPE_SINGLE_REF = new FieldType("single_ref");
+    public static final FieldType TYPE_DATETIME   = new FieldType("datetime");
+    public static final FieldType TYPE_DATE       = new FieldType("date");
     
     private String name;
     private FieldType type;

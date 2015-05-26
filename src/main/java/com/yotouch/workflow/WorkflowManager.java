@@ -1,8 +1,10 @@
 package com.yotouch.workflow;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.yotouch.config.ConfigManager;
@@ -30,13 +32,36 @@ public class WorkflowManager {
         
         String uri = "/workflow/get/" + name;
         JSONObject obj = gClient.doGet(uri);
-        System.out.println(obj);
         
         JSONObject wfObj = obj.getJSONObject("result").getJSONObject("workflow");
         MetaEntity wfMe  = MetaEntity.fromJsonObject(wfObj.getJSONObject("meta_entity"));
-        Entity entity    = Entity.fromJsonObject(wfMe, wfObj.getJSONObject("entity"));
+        Entity entity    = Entity.fromJsonObject(this.cfgMgr.getWorkflowManager(), wfMe, wfObj.getJSONObject("entity"));
+        Workflow wf = new Workflow(entity);
         
-        Workflow wf = new Workflow(this, entity);
+        uri = "/workflow/get_states/" + name;
+        obj = gClient.doGet(uri);
+        
+        JSONObject stateObj = obj.getJSONObject("result").getJSONObject("states");
+        MetaEntity stateMe  = MetaEntity.fromJsonObject(stateObj.getJSONObject("meta_entity"));
+        JSONArray entityArray = stateObj.getJSONArray("entities");
+        List<Entity> l = Entity.fromJsonArray(this.cfgMgr.getWorkflowManager(), stateMe, entityArray);
+        
+        for (Entity e: l) {
+            wf.addState(State.create(wf, e));
+        }
+        
+        uri = "/workflow/get_actions/" + name;
+        obj = gClient.doGet(uri);
+        
+        JSONObject actionObj = obj.getJSONObject("result").getJSONObject("actions");
+        MetaEntity actionMe  = MetaEntity.fromJsonObject(actionObj.getJSONObject("meta_entity"));
+        entityArray = actionObj.getJSONArray("entities");
+        List<Entity> actions = Entity.fromJsonArray(this.cfgMgr.getWorkflowManager(), actionMe, entityArray);
+        
+        for (Entity a: actions) {
+            wf.addAction(Action.create(wf, a));
+        }
+        
         this.addWorkflow(wf);
         
         return this.wfMap.get(name);

@@ -1,7 +1,6 @@
 package com.yotouch.network;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -15,13 +14,16 @@ import org.json.JSONObject;
 
 import com.yotouch.entity.Entity;
 import com.yotouch.entity.MetaEntity;
+import com.yotouch.workflow.WorkflowManager;
 
 public class GetClient {
     
     private String ytUrl;
     private String companyId;
+    private WorkflowManager wfMgr;
     
-    public GetClient(String ytUrl, String companyId) {
+    public GetClient(WorkflowManager wfMgr, String ytUrl, String companyId) {
+        this.wfMgr = wfMgr;
         this.ytUrl = ytUrl;
         this.companyId = companyId;
     }
@@ -29,7 +31,7 @@ public class GetClient {
     public JSONObject doGet(String uri) {
         String fullUrl = this.ytUrl + uri;
         
-        System.out.println("Do get " + fullUrl);
+        //System.out.println("Do get " + fullUrl);
         
         CloseableHttpClient httpClient = HttpClients.createDefault();
         try {
@@ -37,7 +39,7 @@ public class GetClient {
             CloseableHttpResponse httpResp = httpClient.execute(httpGet);
             HttpEntity httpEntity = httpResp.getEntity();
             String body = EntityUtils.toString(httpEntity, "utf8");
-            System.out.println("response " + body);
+            //System.out.println("response " + body);
             
             JSONObject obj = new JSONObject(body);
             return obj;
@@ -56,29 +58,24 @@ public class GetClient {
     }
     
     public Entity doGetEntity(String uri) {
+        System.out.println("GEt entity " + uri);
         JSONObject jsonObj = this.doGet(uri);
         JSONObject resultObj = jsonObj.getJSONObject("result");
 
         MetaEntity metaEntity = MetaEntity.fromJsonObject(resultObj.getJSONObject("meta_entity"));
-        Entity entity = Entity.fromJsonObject(metaEntity, resultObj.getJSONObject("entity"));
+        Entity entity = Entity.fromJsonObject(wfMgr, metaEntity, resultObj.getJSONObject("entity"));
         
         return entity;        
     }
 
     public List<Entity> doGetEntityList(String uri) {
-        
         JSONObject jsonObj = this.doGet(uri);
         JSONObject resultObj = jsonObj.getJSONObject("result");
 
         MetaEntity metaEntity = MetaEntity.fromJsonObject(resultObj.getJSONObject("meta_entity"));
         
-        List<Entity> l = new ArrayList<>();
-        JSONArray entityArray = resultObj.getJSONArray("entities"); 
-        for (int i = 0; i < entityArray.length(); i++) {
-            Entity entity = Entity.fromJsonObject(metaEntity, entityArray.getJSONObject(i));
-            l.add(entity);
-        }        
-        
+        JSONArray entityArray = resultObj.getJSONArray("entities");
+        List<Entity> l = Entity.fromJsonArray(this.wfMgr, metaEntity, entityArray);
         return l;
     }
 

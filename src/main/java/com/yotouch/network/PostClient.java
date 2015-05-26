@@ -9,17 +9,19 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-
 import org.json.JSONObject;
 
 import com.yotouch.entity.Entity;
 import com.yotouch.entity.MetaEntity;
+import com.yotouch.workflow.WorkflowManager;
 
 public class PostClient {
     
     private String ytUrl;
+    private WorkflowManager wfMgr;
 
-    public PostClient(String ytUrl) {
+    public PostClient(WorkflowManager wfMgr, String ytUrl) {
+        this.wfMgr = wfMgr;
         this.ytUrl = ytUrl;
     }
     
@@ -36,6 +38,8 @@ public class PostClient {
             input.setContentEncoding("utf8");
             input.setContentType("application/json");
             post.setEntity(input);
+            
+            System.out.println("postbody " + postBody);
 
 
             CloseableHttpResponse httpResp = httpClient.execute(post);
@@ -63,7 +67,7 @@ public class PostClient {
         JSONObject resultObj = jsonObj.getJSONObject("result");
 
         MetaEntity metaEntity = MetaEntity.fromJsonObject(resultObj.getJSONObject("meta_entity"));
-        Entity savedEntity = Entity.fromJsonObject(metaEntity, resultObj.getJSONObject("entity"));
+        Entity savedEntity = Entity.fromJsonObject(this.wfMgr, metaEntity, resultObj.getJSONObject("entity"));
         
         return savedEntity;        
     }
