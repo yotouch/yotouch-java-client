@@ -2,6 +2,8 @@ package com.yotouch.config;
 
 import com.yotouch.network.PostClient;
 import com.yotouch.network.GetClient;
+import com.yotouch.workflow.Workflow;
+import com.yotouch.workflow.WorkflowManager;
 import com.yotouch.entity.Entity;
 import com.yotouch.entity.EntityCollection;
 import com.yotouch.entity.MetaEntity;
@@ -19,17 +21,21 @@ public class ConfigManager {
     private GetClient getClient;
     private PostClient postClient;
     private MetaEntityManager metaEntityManager;
+    private WorkflowManager wfMgr;
 
     public ConfigManager(String yotouchUrl, String company) {
         //this.ytUrl = yotouchUrl;
-        this.getClient = new GetClient(yotouchUrl);
-        this.postClient = new PostClient(yotouchUrl);
+        GetClient gc = new GetClient(yotouchUrl, null);
+        
         
         String uri = "/company/get/" + company;
-        this.companyEntity = this.getClient.doGetEntity(uri);
+        this.companyEntity = gc.doGetEntity(uri);
         this.companyId = this.companyEntity.getUUID();
         
+        this.getClient  = new GetClient(yotouchUrl, this.companyId);
+        this.postClient = new PostClient(yotouchUrl);
         this.metaEntityManager = new MetaEntityManager(this);
+        this.wfMgr = new WorkflowManager(this);
     }
 
     public String getCompanyId() {
@@ -51,6 +57,10 @@ public class ConfigManager {
 
     public PostClient getPostClient() {
         return this.postClient;
+    }
+
+    public Workflow getWorkflow(String name) {
+        return this.wfMgr.getWorkflow(name);
     }
 
 }

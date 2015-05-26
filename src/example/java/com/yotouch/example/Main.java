@@ -6,6 +6,7 @@ import java.util.List;
 import com.yotouch.config.ConfigManager;
 import com.yotouch.entity.Entity;
 import com.yotouch.entity.EntityCollection;
+import com.yotouch.workflow.Workflow;
 
 /**
  * Created by yinwm on 5/10/15.
@@ -27,7 +28,6 @@ public class Main {
         staff.setValue("fullname", "管理");
         Entity savedStaff = staffColl.save(staff);
         
-        
         EntityCollection orderColl = cfgMgr.getEntityCollection("order");
         List<Entity> orders = orderColl.find();
         System.out.println("orders " + orders);
@@ -36,6 +36,10 @@ public class Main {
         Entity order = orderColl.newOne();
         order.setValue("created_at", new Date());
         orderColl.save(order);
+        
+        Workflow wf = cfgMgr.getWorkflow("order");
+        System.out.println("Workflow " + wf);
+        
         
         
 

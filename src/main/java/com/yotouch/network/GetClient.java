@@ -19,9 +19,11 @@ import com.yotouch.entity.MetaEntity;
 public class GetClient {
     
     private String ytUrl;
+    private String companyId;
     
-    public GetClient(String ytUrl) {
+    public GetClient(String ytUrl, String companyId) {
         this.ytUrl = ytUrl;
+        this.companyId = companyId;
     }
     
     public JSONObject doGet(String uri) {
@@ -78,6 +80,12 @@ public class GetClient {
         }        
         
         return l;
+    }
+
+    public Entity doGetEntity(String entityName, String idOrName) {
+        String uri = "/entity/get/" + entityName + "/" + this.companyId + "/" + idOrName;
+        Entity entity = this.doGetEntity(uri);
+        return entity;
     }
     
 }

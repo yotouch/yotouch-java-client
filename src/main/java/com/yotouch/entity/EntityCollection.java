@@ -21,8 +21,9 @@ public class EntityCollection {
     public Entity get(String idOrName) {
         GetClient gClient = cfgMgr.getGetClient();
         
-        String uri = "/entity/get/" + this.metaEntity.getName() + "/" + this.cfgMgr.getCompanyId()+ "/" + idOrName;
-        Entity entity = gClient.doGetEntity(uri);
+        
+        
+        Entity entity = gClient.doGetEntity(this.metaEntity.getName(), idOrName);
         
         return entity;
     }
